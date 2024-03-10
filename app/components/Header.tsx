@@ -6,63 +6,40 @@ import Button from "./Button";
 import Link from "next/link";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { FaPlus } from "react-icons/fa6";
-import {
-  CONTRACT_ADDRESS,
-  TOKEN_CONTRACT_ADDRESS,
-} from "../smart-contract/constants";
-import CONTRACT_ABI from "../smart-contract/wordanamain-abi.json";
-import TOKEN_ABI from "../smart-contract/token-abi.json";
-import Web3 from "web3";
-import { useAccount, useContractRead, useContractWrite } from "wagmi";
-import { BigNumber } from "bignumber.js";
+import { Wallet } from "./../services/near-wallet";
+
+const CONTRACT_NAME = "guestbook.near-examples.testnet";
+
+// When creating the wallet you can choose to create an access key, so the user
+// can skip signing non-payable methods when talking wth the  contract
+const wallet = new Wallet({ createAccessKeyFor: CONTRACT_NAME });
 
 const Header = () => {
-  const { address } = useAccount();
-  const { data: allowanceData }: { data: any } = useContractRead({
-    address: TOKEN_CONTRACT_ADDRESS,
-    abi: TOKEN_ABI,
-    functionName: "allowance",
-    args: [address, CONTRACT_ADDRESS],
-  });
+  const signIn = () => {
+    wallet.signIn();
+  };
 
-  const { data: userXp, error } = useContractRead({
-    address: CONTRACT_ADDRESS,
-    abi: CONTRACT_ABI,
-    functionName: "XP", // Replace with the actual public variable name
-  });
+  const signOut = () => {
+    wallet.signOut();
+  };
 
-  const bigintValue = new BigNumber(allowanceData);
-  const realTokenValue = bigintValue.div(BigNumber(10).exponentiatedBy(18));
-  const displayValue = realTokenValue.toNumber();
-  const [showReloadButton, setShowReloadButton] = useState(false)
-
-  const { data: approveData, write: allowanceWrite } = useContractWrite({
-    address: TOKEN_CONTRACT_ADDRESS,
-    abi: TOKEN_ABI,
-    functionName: "approve",
-    args: [CONTRACT_ADDRESS, new BigNumber(100).integerValue().toString()],
-  });
+  console.log(wallet);
 
   return (
     <div className="flex items-center justify-between">
       <Link href="/" className="cursor-pointer">
         <Image src="/icons/brandLogo.svg" alt="logo" height={64} width={192} />
       </Link>
-      {/* Sign in player */}
-      <div
-        className="flex gap-2 items-center  text-primary cursor-pointer border-solid border-2 border-primary rounded-xl font-mono p-2 hover:bg-primary hover:text-black focus:outline-none focus:ring focus:ring-violet-300"
-        onClick={allowanceWrite as any}
-      >
-        <div className="flex gap-2 items-center hover:text-black" onClick={()=>{
-          setTimeout(()=>setShowReloadButton(true), 5000)
-        }}>
-          <p className="flex items-center gap-2 retro text-xs"><FaPlus color='inherit' size={16} /> Staking Balance:  {isNaN(displayValue)? '' : displayValue}</p>
-        </div>
-        
-      </div>
 
-      {showReloadButton && <p className="text-sm text-black font-bold hover:text-white cursor-pointer bg-white p-3 rounded-lg" onClick={()=>location.reload()}>reload</p>}
-      <ConnectButton />
+      {wallet.accountId ? (
+        <div onClick={signOut}>
+          <Button title={wallet.accountId} />{" "}
+        </div>
+      ) : (
+        <div onClick={signIn}>
+          <Button title="Sign iN" />
+        </div>
+      )}
     </div>
   );
 };
