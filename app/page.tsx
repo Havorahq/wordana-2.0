@@ -7,32 +7,13 @@ import Link from "next/link";
 import { useAccount } from "wagmi";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { Wallet } from "./services/near-wallet";
-import { useEffect } from "react";
-
-const CONTRACT_NAME = "guestbook.near-examples.testnet";
-
-// When creating the wallet you can choose to create an access key, so the user
-// can skip signing non-payable methods when talking wth the  contract
-const wallet = new Wallet({ createAccessKeyFor: CONTRACT_NAME });
 
 export default function Home() {
-  useEffect(() => {
-    wallet.startUp();
-  }, [wallet]);
-
-  // window.onload = async () => {
-  //   const isSignedIn = await wallet.startUp();
-  // };
-
-  const signIn = () => {
-    wallet.signIn();
-  };
-
-  const signOut = () => {
-    wallet.signOut();
-  };
-
+  const account = useAccount();
+  const notify = () =>
+    toast.error("Wallet is not connected!", {
+      position: "top-center",
+    });
   return (
     <div>
       <ToastContainer />
@@ -56,13 +37,13 @@ export default function Home() {
             join the puzzle revolution and earn value in the <br />
             world of decentralised gaming
           </p>
-          {wallet.accountId ? (
+          {account?.isConnected ? (
             <Link href={"/gamemode"}>
               <Button title="Start Playing" />
             </Link>
           ) : (
-            <div onClick={signIn}>
-              <Button title="Sign In" />
+            <div onClick={notify}>
+              <Button title="Start Playing" />
             </div>
           )}
         </div>
