@@ -1,2 +1,6 @@
-DEFINE_NEAR_METHOD(get_greeting)
-DEFINE_NEAR_METHOD(set_greeting)
+DEFINE_NEAR_METHOD(conclude_game)
+DEFINE_NEAR_METHOD(create_game_instance)
+DEFINE_NEAR_METHOD(enter_game)
+DEFINE_NEAR_METHOD(get_game_instance)
+DEFINE_NEAR_METHOD(record_game)
+DEFINE_NEAR_METHOD(stake_coins)

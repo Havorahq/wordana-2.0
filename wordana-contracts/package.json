@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "near-sdk-js build src/contract.ts build/hello_near.wasm",
+    "build:main": "near-sdk-js build src/wordana.ts build/wordana.wasm",
     "test": "$npm_execpath run build && cd sandbox-ts && $npm_execpath run test -- -- ../build/hello_near.wasm",
     "postinstall": "cd sandbox-ts && $npm_execpath install"
   },
