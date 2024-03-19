@@ -1,17 +1,30 @@
 // Find all our documentation at https://docs.near.org
-import { NearBindgen, near, call, view, UnorderedMap, AccountId } from 'near-sdk-js';
+import { NearBindgen, near, call, view, UnorderedMap, AccountId, initialize } from 'near-sdk-js';
 import { GameInstance } from './types';
 import { assert } from './utils';
 import words from './words';
 
-@NearBindgen({})
+@NearBindgen({requireInit: true})
 class WordanaMain {
 
     gameInstances: UnorderedMap<GameInstance> = new UnorderedMap<GameInstance>('games');
+    wordOfTheDay: string;
+    tokensToBeEarned: number;
+    appKey: string;
+    owner: AccountId;
 
+    @initialize({ privateFunction: true })
+    init({ _tokensToEarn }: { _tokensToEarn: number }) {
+        this.owner = near.predecessorAccountId()
+        this.tokensToBeEarned = _tokensToEarn;
+        const randomNumbers: Uint8Array = near.randomSeed();
+        this.wordOfTheDay = words[randomNumbers[0]]
+    }
+ 
 
-    @call({}) // This method changes the state, for which it cost gas
-    create_game_instance({ player2Id, entryPrice }: { player2Id: AccountId, entryPrice: number }): GameInstance {
+    @call({payableFunction: true}) // This method changes the state, for which it cost gas
+    create_game_instance({ player2Id, entryPrice }: { player2Id: AccountId, entryPrice: bigint }): GameInstance {
+        assert(entryPrice === near.attachedDeposit() as bigint, "Please deposit the exact amount specified as entry price")
         const player1Id = near.predecessorAccountId();
 
         assert(player1Id !== player2Id, 'You cannot invite yourself to a game')
@@ -31,10 +44,10 @@ class WordanaMain {
             prizeCollected: false,
             status: 'pending',
             wordToGuess,
-            player2HasEntered: false
+            player2HasEntered: false,
+            rewardCollected: false
         };
 
-        this.stake_coins()
         this.gameInstances.set(player1Id, newGameInstance);
         // stake function
         near.log(`new game instance created ${player2Id}`);
@@ -42,13 +55,13 @@ class WordanaMain {
         return newGameInstance
     }
 
-    @call({})
+    @call({payableFunction: true})
     enter_game(player1Id: AccountId): GameInstance {
         const gameToEnter: GameInstance = this.gameInstances.get(player1Id)
-        
+        assert(gameToEnter.entryPrice === near.attachedDeposit() as bigint, "Please deposit the exact amount specified as entry price")
+
         if (gameToEnter.status !== 'concluded'){
             if (gameToEnter.player2Id === near.predecessorAccountId()){
-                this.stake_coins()
                 gameToEnter.status = 'in progress';
                 gameToEnter.player2HasEntered = true
                 this.gameInstances.set(player1Id, gameToEnter);
@@ -60,11 +73,6 @@ class WordanaMain {
         }
         near.log(`Player 2 has entered the game`)
         return gameToEnter
-    }
-
-    @call ({privateFunction: true})
-    stake_coins(): void {
-        near.log("coins staked")
     }
 
     @call ({})
@@ -93,7 +101,7 @@ class WordanaMain {
         }
     }
 
-    @call ({})
+    @call ({privateFunction: true})
     conclude_game({player1Id}:{player1Id: AccountId}): void{
         const gameInstance: GameInstance = this.gameInstances.get(player1Id);
         gameInstance.status = 'concluded';
@@ -115,6 +123,33 @@ class WordanaMain {
         return this.gameInstances.get(player1Id)
     }
 
+    @view ({})
+    get_word_for_single_player({appkey}:{appkey: string}): string{
+        assert(appkey === this.appKey, "Wrong app key")
+        const randomNumbers: Uint8Array = near.randomSeed();
+        return words[randomNumbers[0]]
+    }
+
+    @call({})
+    set_appkey({newAppkey}:{newAppkey:string}): void{
+        assert(near.predecessorAccountId() === this.owner, "You are not allowed to call this function")
+        this.appKey = newAppkey
+    }
+
     // winner claim reward function
+    @call({payableFunction: true})
+    multiplayer_claim_reward({player1Id}:{player1Id: AccountId}): void{
+        const game: GameInstance = this.gameInstances.get(player1Id);
+        assert(game.status === 'concluded', "The game has not concluded");
+        assert(game.winner === near.predecessorAccountId(), "You are not the winner of this game");
+
+        // Send the money to the winner
+        const toTransfar = game.entryPrice + game.entryPrice;
+        const promise = near.promiseBatchCreate(near.predecessorAccountId());
+        near.promiseBatchActionTransfer(promise, toTransfar);
+
+        game.rewardCollected = true;
+        this.gameInstances.set(player1Id, game);
+    }
     // refund for draw function
 }
