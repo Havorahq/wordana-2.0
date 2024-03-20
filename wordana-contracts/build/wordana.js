@@ -283,6 +283,23 @@ function randomSeed() {
   env.random_seed(0);
   return env.read_register(0);
 }
+/**
+ * Create a NEAR promise which will have multiple promise actions inside.
+ *
+ * @param accountId - The account ID of the target contract.
+ */
+function promiseBatchCreate(accountId) {
+  return env.promise_batch_create(accountId);
+}
+/**
+ * Attach a transfer promise action to the NEAR promise index with the provided promise index.
+ *
+ * @param promiseIndex - The index of the promise to attach a transfer action to.
+ * @param amount - The amount of NEAR to transfer.
+ */
+function promiseBatchActionTransfer(promiseIndex, amount) {
+  env.promise_batch_action_transfer(promiseIndex, amount);
+}
 
 /**
  * A lookup map that stores data in NEAR storage.
@@ -762,6 +779,17 @@ class UnorderedMapIterator {
 }
 
 /**
+ * Tells the SDK to use this function as the initialization function of the contract.
+ *
+ * @param _empty - An empty object.
+ */
+function initialize(_empty) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return function (_target, _key, _descriptor
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  ) {};
+}
+/**
  * Tells the SDK to expose this function as a view function.
  *
  * @param _empty - An empty object.
@@ -844,16 +872,37 @@ function assert(statement, message) {
 
 const words = ["there", "their", "about", "would", "these", "other", "words", "could", "write", "first", "water", "after", "where", "right", "think", "three", "years", "place", "sound", "great", "again", "still", "every", "small", "found", "those", "never", "under", "might", "while", "house", "world", "below", "asked", "going", "large", "until", "along", "shall", "being", "often", "earth", "began", "since", "study", "night", "light", "above", "paper", "parts", "young", "story", "point", "times", "heard", "whole", "white", "given", "means", "music", "miles", "thing", "today", "later", "using", "money", "lines", "order", "group", "among", "learn", "known", "space", "table", "early", "trees", "short", "hands", "state", "black", "shown", "stood", "front", "voice", "kinds", "makes", "comes", "close", "power", "lived", "vowel", "taken", "built", "heart", "ready", "quite", "class", "bring", "round", "horse", "shows", "piece", "green", "stand", "birds", "start", "river", "tried", "least", "field", "whose", "girls", "leave", "added", "color", "third", "hours", "moved", "plant", "doing", "names", "forms", "heavy", "ideas", "cried", "check", "floor", "begin", "woman", "alone", "plane", "spell", "watch", "carry", "wrote", "clear", "named", "books", "child", "glass", "human", "takes", "party", "build", "seems", "blood", "sides", "seven", "mouth", "solve", "north", "value", "death", "maybe", "happy", "tells", "gives", "looks", "shape", "lives", "steps", "areas", "sense", "speak", "force", "ocean", "speed", "women", "metal", "south", "grass", "scale", "cells", "lower", "sleep", "wrong", "pages", "ships", "needs", "rocks", "eight", "major", "level", "total", "ahead", "reach", "stars", "store", "sight", "terms", "catch", "works", "board", "cover", "songs", "equal", "stone", "waves", "guess", "dance", "spoke", "break", "cause", "radio", "weeks", "lands", "basic", "liked", "trade", "fresh", "final", "fight", "meant", "drive", "spent", "local", "waxes", "knows", "train", "bread", "homes", "teeth", "coast", "thick", "brown", "clean", "quiet", "sugar", "facts", "steel", "forth", "rules", "notes", "units", "peace", "month", "verbs", "seeds", "helps", "sharp", "visit", "woods", "chief", "walls", "cross", "wings", "grown", "cases", "foods", "crops", "fruit", "stick", "wants", "stage", "sheep", "nouns", "plain", "drink", "bones", "apart", "turns"];
 
-var _dec, _dec2, _dec3, _dec4, _dec5, _dec6, _dec7, _class, _class2;
-let WordanaMain = (_dec = NearBindgen({}), _dec2 = call({}), _dec3 = call({}), _dec4 = call({
+var _dec, _dec2, _dec3, _dec4, _dec5, _dec6, _dec7, _dec8, _dec9, _dec10, _class, _class2;
+let WordanaMain = (_dec = NearBindgen({
+  requireInit: true
+}), _dec2 = initialize(), _dec3 = call({
+  payableFunction: true
+}), _dec4 = call({
+  payableFunction: true
+}), _dec5 = call({}), _dec6 = call({
   privateFunction: true
-}), _dec5 = call({}), _dec6 = call({}), _dec7 = view(), _dec(_class = (_class2 = class WordanaMain {
+}), _dec7 = view(), _dec8 = view(), _dec9 = call({}), _dec10 = call({
+  payableFunction: true
+}), _dec(_class = (_class2 = class WordanaMain {
   gameInstances = new UnorderedMap('games');
+  wordOfTheDay = 'words';
+  tokensToBeEarned = 0;
+  appKey = '';
+  owner = '';
+  init({
+    _tokensToEarn
+  }) {
+    this.owner = predecessorAccountId();
+    this.tokensToBeEarned = _tokensToEarn;
+    const randomNumbers = randomSeed();
+    this.wordOfTheDay = words[randomNumbers[0]];
+  }
   // This method changes the state, for which it cost gas
   create_game_instance({
     player2Id,
     entryPrice
   }) {
+    assert(entryPrice === attachedDeposit(), "Please deposit the exact amount specified as entry price");
     const player1Id = predecessorAccountId();
     assert(player1Id !== player2Id, 'You cannot invite yourself to a game');
 
@@ -871,9 +920,9 @@ let WordanaMain = (_dec = NearBindgen({}), _dec2 = call({}), _dec3 = call({}), _
       prizeCollected: false,
       status: 'pending',
       wordToGuess,
-      player2HasEntered: false
+      player2HasEntered: false,
+      rewardCollected: false
     };
-    this.stake_coins();
     this.gameInstances.set(player1Id, newGameInstance);
     // stake function
     log(`new game instance created ${player2Id}`);
@@ -881,9 +930,9 @@ let WordanaMain = (_dec = NearBindgen({}), _dec2 = call({}), _dec3 = call({}), _
   }
   enter_game(player1Id) {
     const gameToEnter = this.gameInstances.get(player1Id);
+    assert(gameToEnter.entryPrice === attachedDeposit(), "Please deposit the exact amount specified as entry price");
     if (gameToEnter.status !== 'concluded') {
       if (gameToEnter.player2Id === predecessorAccountId()) {
-        this.stake_coins();
         gameToEnter.status = 'in progress';
         gameToEnter.player2HasEntered = true;
         this.gameInstances.set(player1Id, gameToEnter);
@@ -895,9 +944,6 @@ let WordanaMain = (_dec = NearBindgen({}), _dec2 = call({}), _dec3 = call({}), _
     }
     log(`Player 2 has entered the game`);
     return gameToEnter;
-  }
-  stake_coins() {
-    log("coins staked");
   }
   record_game({
     player1Id,
@@ -951,10 +997,78 @@ let WordanaMain = (_dec = NearBindgen({}), _dec2 = call({}), _dec3 = call({}), _
     log('reading the game instances');
     return this.gameInstances.get(player1Id);
   }
+  get_word_for_single_player({
+    appkey
+  }) {
+    assert(appkey === this.appKey, "Wrong app key");
+    const randomNumbers = randomSeed();
+    return words[randomNumbers[0]];
+  }
+  set_appkey({
+    newAppkey
+  }) {
+    assert(predecessorAccountId() === this.owner, "You are not allowed to call this function");
+    this.appKey = newAppkey;
+  }
 
   // winner claim reward function
+  multiplayer_claim_reward({
+    player1Id
+  }) {
+    const game = this.gameInstances.get(player1Id);
+    assert(game.status === 'concluded', "The game has not concluded");
+    assert(game.winner === predecessorAccountId(), "You are not the winner of this game");
+
+    // Send the money to the winner
+    const toTransfar = game.entryPrice + game.entryPrice;
+    const promise = promiseBatchCreate(predecessorAccountId());
+    promiseBatchActionTransfer(promise, toTransfar);
+    game.rewardCollected = true;
+    this.gameInstances.set(player1Id, game);
+  }
   // refund for draw function
-}, (_applyDecoratedDescriptor(_class2.prototype, "create_game_instance", [_dec2], Object.getOwnPropertyDescriptor(_class2.prototype, "create_game_instance"), _class2.prototype), _applyDecoratedDescriptor(_class2.prototype, "enter_game", [_dec3], Object.getOwnPropertyDescriptor(_class2.prototype, "enter_game"), _class2.prototype), _applyDecoratedDescriptor(_class2.prototype, "stake_coins", [_dec4], Object.getOwnPropertyDescriptor(_class2.prototype, "stake_coins"), _class2.prototype), _applyDecoratedDescriptor(_class2.prototype, "record_game", [_dec5], Object.getOwnPropertyDescriptor(_class2.prototype, "record_game"), _class2.prototype), _applyDecoratedDescriptor(_class2.prototype, "conclude_game", [_dec6], Object.getOwnPropertyDescriptor(_class2.prototype, "conclude_game"), _class2.prototype), _applyDecoratedDescriptor(_class2.prototype, "get_game_instance", [_dec7], Object.getOwnPropertyDescriptor(_class2.prototype, "get_game_instance"), _class2.prototype)), _class2)) || _class);
+}, (_applyDecoratedDescriptor(_class2.prototype, "init", [_dec2], Object.getOwnPropertyDescriptor(_class2.prototype, "init"), _class2.prototype), _applyDecoratedDescriptor(_class2.prototype, "create_game_instance", [_dec3], Object.getOwnPropertyDescriptor(_class2.prototype, "create_game_instance"), _class2.prototype), _applyDecoratedDescriptor(_class2.prototype, "enter_game", [_dec4], Object.getOwnPropertyDescriptor(_class2.prototype, "enter_game"), _class2.prototype), _applyDecoratedDescriptor(_class2.prototype, "record_game", [_dec5], Object.getOwnPropertyDescriptor(_class2.prototype, "record_game"), _class2.prototype), _applyDecoratedDescriptor(_class2.prototype, "conclude_game", [_dec6], Object.getOwnPropertyDescriptor(_class2.prototype, "conclude_game"), _class2.prototype), _applyDecoratedDescriptor(_class2.prototype, "get_game_instance", [_dec7], Object.getOwnPropertyDescriptor(_class2.prototype, "get_game_instance"), _class2.prototype), _applyDecoratedDescriptor(_class2.prototype, "get_word_for_single_player", [_dec8], Object.getOwnPropertyDescriptor(_class2.prototype, "get_word_for_single_player"), _class2.prototype), _applyDecoratedDescriptor(_class2.prototype, "set_appkey", [_dec9], Object.getOwnPropertyDescriptor(_class2.prototype, "set_appkey"), _class2.prototype), _applyDecoratedDescriptor(_class2.prototype, "multiplayer_claim_reward", [_dec10], Object.getOwnPropertyDescriptor(_class2.prototype, "multiplayer_claim_reward"), _class2.prototype)), _class2)) || _class);
+function multiplayer_claim_reward() {
+  const _state = WordanaMain._getState();
+  if (!_state && WordanaMain._requireInit()) {
+    throw new Error("Contract must be initialized");
+  }
+  const _contract = WordanaMain._create();
+  if (_state) {
+    WordanaMain._reconstruct(_contract, _state);
+  }
+  const _args = WordanaMain._getArgs();
+  const _result = _contract.multiplayer_claim_reward(_args);
+  WordanaMain._saveToStorage(_contract);
+  if (_result !== undefined) if (_result && _result.constructor && _result.constructor.name === "NearPromise") _result.onReturn();else env.value_return(WordanaMain._serialize(_result, true));
+}
+function set_appkey() {
+  const _state = WordanaMain._getState();
+  if (!_state && WordanaMain._requireInit()) {
+    throw new Error("Contract must be initialized");
+  }
+  const _contract = WordanaMain._create();
+  if (_state) {
+    WordanaMain._reconstruct(_contract, _state);
+  }
+  const _args = WordanaMain._getArgs();
+  const _result = _contract.set_appkey(_args);
+  WordanaMain._saveToStorage(_contract);
+  if (_result !== undefined) if (_result && _result.constructor && _result.constructor.name === "NearPromise") _result.onReturn();else env.value_return(WordanaMain._serialize(_result, true));
+}
+function get_word_for_single_player() {
+  const _state = WordanaMain._getState();
+  if (!_state && WordanaMain._requireInit()) {
+    throw new Error("Contract must be initialized");
+  }
+  const _contract = WordanaMain._create();
+  if (_state) {
+    WordanaMain._reconstruct(_contract, _state);
+  }
+  const _args = WordanaMain._getArgs();
+  const _result = _contract.get_word_for_single_player(_args);
+  if (_result !== undefined) if (_result && _result.constructor && _result.constructor.name === "NearPromise") _result.onReturn();else env.value_return(WordanaMain._serialize(_result, true));
+}
 function get_game_instance() {
   const _state = WordanaMain._getState();
   if (!_state && WordanaMain._requireInit()) {
@@ -996,20 +1110,6 @@ function record_game() {
   WordanaMain._saveToStorage(_contract);
   if (_result !== undefined) if (_result && _result.constructor && _result.constructor.name === "NearPromise") _result.onReturn();else env.value_return(WordanaMain._serialize(_result, true));
 }
-function stake_coins() {
-  const _state = WordanaMain._getState();
-  if (!_state && WordanaMain._requireInit()) {
-    throw new Error("Contract must be initialized");
-  }
-  const _contract = WordanaMain._create();
-  if (_state) {
-    WordanaMain._reconstruct(_contract, _state);
-  }
-  const _args = WordanaMain._getArgs();
-  const _result = _contract.stake_coins(_args);
-  WordanaMain._saveToStorage(_contract);
-  if (_result !== undefined) if (_result && _result.constructor && _result.constructor.name === "NearPromise") _result.onReturn();else env.value_return(WordanaMain._serialize(_result, true));
-}
 function enter_game() {
   const _state = WordanaMain._getState();
   if (!_state && WordanaMain._requireInit()) {
@@ -1038,6 +1138,17 @@ function create_game_instance() {
   WordanaMain._saveToStorage(_contract);
   if (_result !== undefined) if (_result && _result.constructor && _result.constructor.name === "NearPromise") _result.onReturn();else env.value_return(WordanaMain._serialize(_result, true));
 }
+function init() {
+  const _state = WordanaMain._getState();
+  if (_state) {
+    throw new Error("Contract already initialized");
+  }
+  const _contract = WordanaMain._create();
+  const _args = WordanaMain._getArgs();
+  const _result = _contract.init(_args);
+  WordanaMain._saveToStorage(_contract);
+  if (_result !== undefined) if (_result && _result.constructor && _result.constructor.name === "NearPromise") _result.onReturn();else env.value_return(WordanaMain._serialize(_result, true));
+}
 
-export { conclude_game, create_game_instance, enter_game, get_game_instance, record_game, stake_coins };
+export { conclude_game, create_game_instance, enter_game, get_game_instance, get_word_for_single_player, init, multiplayer_claim_reward, record_game, set_appkey };
 //# sourceMappingURL=wordana.js.map

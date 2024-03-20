@@ -8,10 +8,10 @@ import words from './words';
 class WordanaMain {
 
     gameInstances: UnorderedMap<GameInstance> = new UnorderedMap<GameInstance>('games');
-    wordOfTheDay: string;
-    tokensToBeEarned: number;
-    appKey: string;
-    owner: AccountId;
+    wordOfTheDay: string = 'words';
+    tokensToBeEarned: number = 0;
+    appKey: string = '';
+    owner: AccountId = '';
 
     @initialize({ privateFunction: true })
     init({ _tokensToEarn }: { _tokensToEarn: number }) {
