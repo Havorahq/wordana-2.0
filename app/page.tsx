@@ -37,7 +37,7 @@ export default function Home () {
   const signOut = () => {
     wallet.signOut();
   };
-
+  
   return (
     <div>
       <ToastContainer />
@@ -61,13 +61,13 @@ export default function Home () {
             join the puzzle revolution and earn value in the <br />
             world of decentralised gaming
           </p>
-          {wallet.accountId ? (
+          {account?.isConnected ? (
             <Link href={"/gamemode"}>
               <Button title="Start Playing" />
             </Link>
           ) : (
-            <div onClick={signIn}>
-              <Button title="Sign In" />
+            <div onClick={notify}>
+              <Button title="Start Playing" />
             </div>
           )}
         </div>

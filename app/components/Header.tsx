@@ -6,20 +6,25 @@ import Button from "./Button";
 import Link from "next/link";
 import { wallet } from "../services/setup";
 
-const CONTRACT_NAME = "guestbook.near-examples.testnet";
-
-// When creating the wallet you can choose to create an access key, so the user
-// can skip signing non-payable methods when talking wth the  contract
-
 const Header = () => {
-  const signIn = () => {
-    wallet.signIn();
-  };
+  const { address } = useAccount();
+  const { data: allowanceData }: { data: any } = useContractRead({
+    address: TOKEN_CONTRACT_ADDRESS,
+    abi: TOKEN_ABI,
+    functionName: "allowance",
+    args: [address, CONTRACT_ADDRESS],
+  });
 
-  const signOut = () => {
-    wallet.signOut();
-  };
+  const { data: userXp, error } = useContractRead({
+    address: CONTRACT_ADDRESS,
+    abi: CONTRACT_ABI,
+    functionName: "XP", // Replace with the actual public variable name
+  });
 
+  const bigintValue = new BigNumber(allowanceData);
+  const realTokenValue = bigintValue.div(BigNumber(10).exponentiatedBy(18));
+  const displayValue = realTokenValue.toNumber();
+  const [showReloadButton, setShowReloadButton] = useState(false)
   return (
     <div className="flex items-center justify-between">
       <Link href="/" className="cursor-pointer">
@@ -34,7 +39,11 @@ const Header = () => {
         <div onClick={signIn}>
           <Button title="Sign iN" />
         </div>
-      )}
+        
+      </div>
+
+      {showReloadButton && <p className="text-sm text-black font-bold hover:text-white cursor-pointer bg-white p-3 rounded-lg" onClick={()=>location.reload()}>reload</p>}
+      <ConnectButton />
     </div>
   );
 };
