@@ -12,6 +12,7 @@ import CONTRACT_ABI from "../smart-contract/wordanamain-abi.json";
 
 import { useRouter } from "next/navigation";
 import { Oval } from "react-loader-spinner";
+import { wordanaInt } from "../services/setup";
 
 const Instruction = () => {
   const { data, setData } = useMyContext();
@@ -59,6 +60,15 @@ const Instruction = () => {
       args: ["password"],
     });
   };
+
+  const getWord =()=>{
+    setLoading(true)
+    wordanaInt.getWordForSinglePlayer().then(word=>{
+      setData(word);
+      router.push("/startgame");
+      setLoading(false);
+    })
+  }
 
   return (
     <div>
@@ -140,7 +150,7 @@ const Instruction = () => {
           </p>
         </div>
         {!loading ? (
-          <div onClick={validateCall} className="mt-8">
+          <div onClick={getWord} className="mt-8">
             <Button title="Initialize Game"></Button>
           </div>
         ) : (

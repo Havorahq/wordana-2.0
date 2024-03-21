@@ -7,13 +7,37 @@ import Link from "next/link";
 import { useAccount } from "wagmi";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useEffect, useState } from "react";
+import { wallet } from "./services/setup";
 
-export default function Home() {
-  const account = useAccount();
-  const notify = () =>
-    toast.error("Wallet is not connected!", {
-      position: "top-center",
-    });
+
+export default function Home () {
+
+  const [isSignedIn, setIsSinged] = useState(false)
+
+  useEffect(() => {
+    checkStatus().then((isSignedIn)=>{
+      setIsSinged(isSignedIn)
+    })
+  }, [wallet]);
+
+  const checkStatus =async (): Promise<boolean>=>{
+    const isSignedIn = await wallet.startUp()
+    return isSignedIn
+  }
+
+  // window.onload = async () => {
+  //   const isSignedIn = await wallet.startUp();
+  // };
+
+  const signIn = () => {
+    wallet.signIn();
+  };
+
+  const signOut = () => {
+    wallet.signOut();
+  };
+  
   return (
     <div>
       <ToastContainer />

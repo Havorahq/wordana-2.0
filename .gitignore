@@ -5,6 +5,8 @@
 /.pnp
 .pnp.js
 .yarn/install-state.gz
+/wordana-contracts/node_modules
+/wordana-contracts/sandbox-ts/node_modules
 
 # testing
 /coverage

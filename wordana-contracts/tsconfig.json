@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "target": "es2020",
+    "noEmit": true,
+    "moduleResolution": "bundler",
+  },
+  "exclude": [
+    "node_modules"
+  ],
+}
