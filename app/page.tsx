@@ -61,12 +61,12 @@ export default function Home () {
             join the puzzle revolution and earn value in the <br />
             world of decentralised gaming
           </p>
-          {account?.isConnected ? (
+          {isSignedIn? (
             <Link href={"/gamemode"}>
               <Button title="Start Playing" />
             </Link>
           ) : (
-            <div onClick={notify}>
+            <div onClick={signIn}>
               <Button title="Start Playing" />
             </div>
           )}
