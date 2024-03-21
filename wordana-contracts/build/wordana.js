@@ -283,6 +283,166 @@ function randomSeed() {
   env.random_seed(0);
   return env.read_register(0);
 }
+/**
+ * Join an arbitrary array of NEAR promises.
+ *
+ * @param promiseIndexes - An arbitrary array of NEAR promise indexes to join.
+ */
+function promiseAnd(...promiseIndexes) {
+  return env.promise_and(...promiseIndexes);
+}
+/**
+ * Create a NEAR promise which will have multiple promise actions inside.
+ *
+ * @param accountId - The account ID of the target contract.
+ */
+function promiseBatchCreate(accountId) {
+  return env.promise_batch_create(accountId);
+}
+/**
+ * Attach a callback NEAR promise to a batch of NEAR promise actions.
+ *
+ * @param promiseIndex - The NEAR promise index of the batch.
+ * @param accountId - The account ID of the target contract.
+ */
+function promiseBatchThen(promiseIndex, accountId) {
+  return env.promise_batch_then(promiseIndex, accountId);
+}
+/**
+ * Attach a create account promise action to the NEAR promise index with the provided promise index.
+ *
+ * @param promiseIndex - The index of the promise to attach a create account action to.
+ */
+function promiseBatchActionCreateAccount(promiseIndex) {
+  env.promise_batch_action_create_account(promiseIndex);
+}
+/**
+ * Attach a deploy contract promise action to the NEAR promise index with the provided promise index.
+ *
+ * @param promiseIndex - The index of the promise to attach a deploy contract action to.
+ * @param code - The WASM byte code of the contract to be deployed.
+ */
+function promiseBatchActionDeployContract(promiseIndex, code) {
+  env.promise_batch_action_deploy_contract(promiseIndex, code);
+}
+/**
+ * Attach a function call promise action to the NEAR promise index with the provided promise index.
+ *
+ * @param promiseIndex - The index of the promise to attach a function call action to.
+ * @param methodName - The name of the method to be called.
+ * @param args - The arguments to call the method with.
+ * @param amount - The amount of NEAR to attach to the call.
+ * @param gas - The amount of Gas to attach to the call.
+ */
+function promiseBatchActionFunctionCallRaw(promiseIndex, methodName, args, amount, gas) {
+  env.promise_batch_action_function_call(promiseIndex, methodName, args, amount, gas);
+}
+/**
+ * Attach a function call promise action to the NEAR promise index with the provided promise index.
+ *
+ * @param promiseIndex - The index of the promise to attach a function call action to.
+ * @param methodName - The name of the method to be called.
+ * @param args - The utf-8 string arguments to call the method with.
+ * @param amount - The amount of NEAR to attach to the call.
+ * @param gas - The amount of Gas to attach to the call.
+ */
+function promiseBatchActionFunctionCall(promiseIndex, methodName, args, amount, gas) {
+  promiseBatchActionFunctionCallRaw(promiseIndex, methodName, encode(args), amount, gas);
+}
+/**
+ * Attach a transfer promise action to the NEAR promise index with the provided promise index.
+ *
+ * @param promiseIndex - The index of the promise to attach a transfer action to.
+ * @param amount - The amount of NEAR to transfer.
+ */
+function promiseBatchActionTransfer(promiseIndex, amount) {
+  env.promise_batch_action_transfer(promiseIndex, amount);
+}
+/**
+ * Attach a stake promise action to the NEAR promise index with the provided promise index.
+ *
+ * @param promiseIndex - The index of the promise to attach a stake action to.
+ * @param amount - The amount of NEAR to stake.
+ * @param publicKey - The public key with which to stake.
+ */
+function promiseBatchActionStake(promiseIndex, amount, publicKey) {
+  env.promise_batch_action_stake(promiseIndex, amount, publicKey);
+}
+/**
+ * Attach a add full access key promise action to the NEAR promise index with the provided promise index.
+ *
+ * @param promiseIndex - The index of the promise to attach a add full access key action to.
+ * @param publicKey - The public key to add as a full access key.
+ * @param nonce - The nonce to use.
+ */
+function promiseBatchActionAddKeyWithFullAccess(promiseIndex, publicKey, nonce) {
+  env.promise_batch_action_add_key_with_full_access(promiseIndex, publicKey, nonce);
+}
+/**
+ * Attach a add access key promise action to the NEAR promise index with the provided promise index.
+ *
+ * @param promiseIndex - The index of the promise to attach a add access key action to.
+ * @param publicKey - The public key to add.
+ * @param nonce - The nonce to use.
+ * @param allowance - The allowance of the access key.
+ * @param receiverId - The account ID of the receiver.
+ * @param methodNames - The names of the method to allow the key for.
+ */
+function promiseBatchActionAddKeyWithFunctionCall(promiseIndex, publicKey, nonce, allowance, receiverId, methodNames) {
+  env.promise_batch_action_add_key_with_function_call(promiseIndex, publicKey, nonce, allowance, receiverId, methodNames);
+}
+/**
+ * Attach a delete key promise action to the NEAR promise index with the provided promise index.
+ *
+ * @param promiseIndex - The index of the promise to attach a delete key action to.
+ * @param publicKey - The public key to delete.
+ */
+function promiseBatchActionDeleteKey(promiseIndex, publicKey) {
+  env.promise_batch_action_delete_key(promiseIndex, publicKey);
+}
+/**
+ * Attach a delete account promise action to the NEAR promise index with the provided promise index.
+ *
+ * @param promiseIndex - The index of the promise to attach a delete account action to.
+ * @param beneficiaryId - The account ID of the beneficiary - the account that receives the remaining amount of NEAR.
+ */
+function promiseBatchActionDeleteAccount(promiseIndex, beneficiaryId) {
+  env.promise_batch_action_delete_account(promiseIndex, beneficiaryId);
+}
+/**
+ * Attach a function call with weight promise action to the NEAR promise index with the provided promise index.
+ *
+ * @param promiseIndex - The index of the promise to attach a function call with weight action to.
+ * @param methodName - The name of the method to be called.
+ * @param args - The arguments to call the method with.
+ * @param amount - The amount of NEAR to attach to the call.
+ * @param gas - The amount of Gas to attach to the call.
+ * @param weight - The weight of unused Gas to use.
+ */
+function promiseBatchActionFunctionCallWeightRaw(promiseIndex, methodName, args, amount, gas, weight) {
+  env.promise_batch_action_function_call_weight(promiseIndex, methodName, args, amount, gas, weight);
+}
+/**
+ * Attach a function call with weight promise action to the NEAR promise index with the provided promise index.
+ *
+ * @param promiseIndex - The index of the promise to attach a function call with weight action to.
+ * @param methodName - The name of the method to be called.
+ * @param args - The utf-8 string arguments to call the method with.
+ * @param amount - The amount of NEAR to attach to the call.
+ * @param gas - The amount of Gas to attach to the call.
+ * @param weight - The weight of unused Gas to use.
+ */
+function promiseBatchActionFunctionCallWeight(promiseIndex, methodName, args, amount, gas, weight) {
+  promiseBatchActionFunctionCallWeightRaw(promiseIndex, methodName, encode(args), amount, gas, weight);
+}
+/**
+ * Executes the promise in the NEAR WASM virtual machine.
+ *
+ * @param promiseIndex - The index of the promise to execute.
+ */
+function promiseReturn(promiseIndex) {
+  env.promise_return(promiseIndex);
+}
 
 /**
  * A lookup map that stores data in NEAR storage.
@@ -762,6 +922,17 @@ class UnorderedMapIterator {
 }
 
 /**
+ * Tells the SDK to use this function as the initialization function of the contract.
+ *
+ * @param _empty - An empty object.
+ */
+function initialize(_empty) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return function (_target, _key, _descriptor
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  ) {};
+}
+/**
  * Tells the SDK to expose this function as a view function.
  *
  * @param _empty - An empty object.
@@ -836,6 +1007,489 @@ function NearBindgen({
   };
 }
 
+/**
+ * A promise action which can be executed on the NEAR blockchain.
+ */
+class PromiseAction {}
+/**
+ * A create account promise action.
+ *
+ * @extends {PromiseAction}
+ */
+class CreateAccount extends PromiseAction {
+  add(promiseIndex) {
+    promiseBatchActionCreateAccount(promiseIndex);
+  }
+}
+/**
+ * A deploy contract promise action.
+ *
+ * @extends {PromiseAction}
+ */
+class DeployContract extends PromiseAction {
+  /**
+   * @param code - The code of the contract to be deployed.
+   */
+  constructor(code) {
+    super();
+    this.code = code;
+  }
+  add(promiseIndex) {
+    promiseBatchActionDeployContract(promiseIndex, this.code);
+  }
+}
+/**
+ * A function call promise action.
+ *
+ * @extends {PromiseAction}
+ */
+class FunctionCall extends PromiseAction {
+  /**
+   * @param functionName - The name of the function to be called.
+   * @param args - The utf-8 string arguments to be passed to the function.
+   * @param amount - The amount of NEAR to attach to the call.
+   * @param gas - The amount of Gas to attach to the call.
+   */
+  constructor(functionName, args, amount, gas) {
+    super();
+    this.functionName = functionName;
+    this.args = args;
+    this.amount = amount;
+    this.gas = gas;
+  }
+  add(promiseIndex) {
+    promiseBatchActionFunctionCall(promiseIndex, this.functionName, this.args, this.amount, this.gas);
+  }
+}
+/**
+ * A function call raw promise action.
+ *
+ * @extends {PromiseAction}
+ */
+class FunctionCallRaw extends PromiseAction {
+  /**
+   * @param functionName - The name of the function to be called.
+   * @param args - The arguments to be passed to the function.
+   * @param amount - The amount of NEAR to attach to the call.
+   * @param gas - The amount of Gas to attach to the call.
+   */
+  constructor(functionName, args, amount, gas) {
+    super();
+    this.functionName = functionName;
+    this.args = args;
+    this.amount = amount;
+    this.gas = gas;
+  }
+  add(promiseIndex) {
+    promiseBatchActionFunctionCallRaw(promiseIndex, this.functionName, this.args, this.amount, this.gas);
+  }
+}
+/**
+ * A function call weight promise action.
+ *
+ * @extends {PromiseAction}
+ */
+class FunctionCallWeight extends PromiseAction {
+  /**
+   * @param functionName - The name of the function to be called.
+   * @param args - The utf-8 string arguments to be passed to the function.
+   * @param amount - The amount of NEAR to attach to the call.
+   * @param gas - The amount of Gas to attach to the call.
+   * @param weight - The weight of unused Gas to use.
+   */
+  constructor(functionName, args, amount, gas, weight) {
+    super();
+    this.functionName = functionName;
+    this.args = args;
+    this.amount = amount;
+    this.gas = gas;
+    this.weight = weight;
+  }
+  add(promiseIndex) {
+    promiseBatchActionFunctionCallWeight(promiseIndex, this.functionName, this.args, this.amount, this.gas, this.weight);
+  }
+}
+/**
+ * A function call weight raw promise action.
+ *
+ * @extends {PromiseAction}
+ */
+class FunctionCallWeightRaw extends PromiseAction {
+  /**
+   * @param functionName - The name of the function to be called.
+   * @param args - The arguments to be passed to the function.
+   * @param amount - The amount of NEAR to attach to the call.
+   * @param gas - The amount of Gas to attach to the call.
+   * @param weight - The weight of unused Gas to use.
+   */
+  constructor(functionName, args, amount, gas, weight) {
+    super();
+    this.functionName = functionName;
+    this.args = args;
+    this.amount = amount;
+    this.gas = gas;
+    this.weight = weight;
+  }
+  add(promiseIndex) {
+    promiseBatchActionFunctionCallWeightRaw(promiseIndex, this.functionName, this.args, this.amount, this.gas, this.weight);
+  }
+}
+/**
+ * A transfer promise action.
+ *
+ * @extends {PromiseAction}
+ */
+class Transfer extends PromiseAction {
+  /**
+   * @param amount - The amount of NEAR to tranfer.
+   */
+  constructor(amount) {
+    super();
+    this.amount = amount;
+  }
+  add(promiseIndex) {
+    promiseBatchActionTransfer(promiseIndex, this.amount);
+  }
+}
+/**
+ * A stake promise action.
+ *
+ * @extends {PromiseAction}
+ */
+class Stake extends PromiseAction {
+  /**
+   * @param amount - The amount of NEAR to tranfer.
+   * @param publicKey - The public key to use for staking.
+   */
+  constructor(amount, publicKey) {
+    super();
+    this.amount = amount;
+    this.publicKey = publicKey;
+  }
+  add(promiseIndex) {
+    promiseBatchActionStake(promiseIndex, this.amount, this.publicKey.data);
+  }
+}
+/**
+ * A add full access key promise action.
+ *
+ * @extends {PromiseAction}
+ */
+class AddFullAccessKey extends PromiseAction {
+  /**
+   * @param publicKey - The public key to add as a full access key.
+   * @param nonce - The nonce to use.
+   */
+  constructor(publicKey, nonce) {
+    super();
+    this.publicKey = publicKey;
+    this.nonce = nonce;
+  }
+  add(promiseIndex) {
+    promiseBatchActionAddKeyWithFullAccess(promiseIndex, this.publicKey.data, this.nonce);
+  }
+}
+/**
+ * A add access key promise action.
+ *
+ * @extends {PromiseAction}
+ */
+class AddAccessKey extends PromiseAction {
+  /**
+   * @param publicKey - The public key to add as a access key.
+   * @param allowance - The allowance for the key in yoctoNEAR.
+   * @param receiverId - The account ID of the receiver.
+   * @param functionNames - The names of funcitons to authorize.
+   * @param nonce - The nonce to use.
+   */
+  constructor(publicKey, allowance, receiverId, functionNames, nonce) {
+    super();
+    this.publicKey = publicKey;
+    this.allowance = allowance;
+    this.receiverId = receiverId;
+    this.functionNames = functionNames;
+    this.nonce = nonce;
+  }
+  add(promiseIndex) {
+    promiseBatchActionAddKeyWithFunctionCall(promiseIndex, this.publicKey.data, this.nonce, this.allowance, this.receiverId, this.functionNames);
+  }
+}
+/**
+ * A delete key promise action.
+ *
+ * @extends {PromiseAction}
+ */
+class DeleteKey extends PromiseAction {
+  /**
+   * @param publicKey - The public key to delete from the account.
+   */
+  constructor(publicKey) {
+    super();
+    this.publicKey = publicKey;
+  }
+  add(promiseIndex) {
+    promiseBatchActionDeleteKey(promiseIndex, this.publicKey.data);
+  }
+}
+/**
+ * A delete account promise action.
+ *
+ * @extends {PromiseAction}
+ */
+class DeleteAccount extends PromiseAction {
+  /**
+   * @param beneficiaryId - The beneficiary of the account deletion - the account to recieve all of the remaining funds of the deleted account.
+   */
+  constructor(beneficiaryId) {
+    super();
+    this.beneficiaryId = beneficiaryId;
+  }
+  add(promiseIndex) {
+    promiseBatchActionDeleteAccount(promiseIndex, this.beneficiaryId);
+  }
+}
+class PromiseSingle {
+  constructor(accountId, actions, after, promiseIndex) {
+    this.accountId = accountId;
+    this.actions = actions;
+    this.after = after;
+    this.promiseIndex = promiseIndex;
+  }
+  constructRecursively() {
+    if (this.promiseIndex !== null) {
+      return this.promiseIndex;
+    }
+    const promiseIndex = this.after ? promiseBatchThen(this.after.constructRecursively(), this.accountId) : promiseBatchCreate(this.accountId);
+    this.actions.forEach(action => action.add(promiseIndex));
+    this.promiseIndex = promiseIndex;
+    return promiseIndex;
+  }
+}
+class PromiseJoint {
+  constructor(promiseA, promiseB, promiseIndex) {
+    this.promiseA = promiseA;
+    this.promiseB = promiseB;
+    this.promiseIndex = promiseIndex;
+  }
+  constructRecursively() {
+    if (this.promiseIndex !== null) {
+      return this.promiseIndex;
+    }
+    const result = promiseAnd(this.promiseA.constructRecursively(), this.promiseB.constructRecursively());
+    this.promiseIndex = result;
+    return result;
+  }
+}
+/**
+ * A high level class to construct and work with NEAR promises.
+ */
+class NearPromise {
+  /**
+   * @param subtype - The subtype of the promise.
+   * @param shouldReturn - Whether the promise should return.
+   */
+  constructor(subtype, shouldReturn) {
+    this.subtype = subtype;
+    this.shouldReturn = shouldReturn;
+  }
+  /**
+   * Creates a new promise to the provided account ID.
+   *
+   * @param accountId - The account ID on which to call the promise.
+   */
+  static new(accountId) {
+    const subtype = new PromiseSingle(accountId, [], null, null);
+    return new NearPromise(subtype, false);
+  }
+  addAction(action) {
+    if (this.subtype instanceof PromiseJoint) {
+      throw new Error("Cannot add action to a joint promise.");
+    }
+    this.subtype.actions.push(action);
+    return this;
+  }
+  /**
+   * Creates a create account promise action and adds it to the current promise.
+   */
+  createAccount() {
+    return this.addAction(new CreateAccount());
+  }
+  /**
+   * Creates a deploy contract promise action and adds it to the current promise.
+   *
+   * @param code - The code of the contract to be deployed.
+   */
+  deployContract(code) {
+    return this.addAction(new DeployContract(code));
+  }
+  /**
+   * Creates a function call promise action and adds it to the current promise.
+   *
+   * @param functionName - The name of the function to be called.
+   * @param args - The utf-8 string arguments to be passed to the function.
+   * @param amount - The amount of NEAR to attach to the call.
+   * @param gas - The amount of Gas to attach to the call.
+   */
+  functionCall(functionName, args, amount, gas) {
+    return this.addAction(new FunctionCall(functionName, args, amount, gas));
+  }
+  /**
+   * Creates a function call raw promise action and adds it to the current promise.
+   *
+   * @param functionName - The name of the function to be called.
+   * @param args - The arguments to be passed to the function.
+   * @param amount - The amount of NEAR to attach to the call.
+   * @param gas - The amount of Gas to attach to the call.
+   */
+  functionCallRaw(functionName, args, amount, gas) {
+    return this.addAction(new FunctionCallRaw(functionName, args, amount, gas));
+  }
+  /**
+   * Creates a function call weight promise action and adds it to the current promise.
+   *
+   * @param functionName - The name of the function to be called.
+   * @param args - The utf-8 string arguments to be passed to the function.
+   * @param amount - The amount of NEAR to attach to the call.
+   * @param gas - The amount of Gas to attach to the call.
+   * @param weight - The weight of unused Gas to use.
+   */
+  functionCallWeight(functionName, args, amount, gas, weight) {
+    return this.addAction(new FunctionCallWeight(functionName, args, amount, gas, weight));
+  }
+  /**
+   * Creates a function call weight raw promise action and adds it to the current promise.
+   *
+   * @param functionName - The name of the function to be called.
+   * @param args - The arguments to be passed to the function.
+   * @param amount - The amount of NEAR to attach to the call.
+   * @param gas - The amount of Gas to attach to the call.
+   * @param weight - The weight of unused Gas to use.
+   */
+  functionCallWeightRaw(functionName, args, amount, gas, weight) {
+    return this.addAction(new FunctionCallWeightRaw(functionName, args, amount, gas, weight));
+  }
+  /**
+   * Creates a transfer promise action and adds it to the current promise.
+   *
+   * @param amount - The amount of NEAR to tranfer.
+   */
+  transfer(amount) {
+    return this.addAction(new Transfer(amount));
+  }
+  /**
+   * Creates a stake promise action and adds it to the current promise.
+   *
+   * @param amount - The amount of NEAR to tranfer.
+   * @param publicKey - The public key to use for staking.
+   */
+  stake(amount, publicKey) {
+    return this.addAction(new Stake(amount, publicKey));
+  }
+  /**
+   * Creates a add full access key promise action and adds it to the current promise.
+   * Uses 0n as the nonce.
+   *
+   * @param publicKey - The public key to add as a full access key.
+   */
+  addFullAccessKey(publicKey) {
+    return this.addFullAccessKeyWithNonce(publicKey, 0n);
+  }
+  /**
+   * Creates a add full access key promise action and adds it to the current promise.
+   * Allows you to specify the nonce.
+   *
+   * @param publicKey - The public key to add as a full access key.
+   * @param nonce - The nonce to use.
+   */
+  addFullAccessKeyWithNonce(publicKey, nonce) {
+    return this.addAction(new AddFullAccessKey(publicKey, nonce));
+  }
+  /**
+   * Creates a add access key promise action and adds it to the current promise.
+   * Uses 0n as the nonce.
+   *
+   * @param publicKey - The public key to add as a access key.
+   * @param allowance - The allowance for the key in yoctoNEAR.
+   * @param receiverId - The account ID of the receiver.
+   * @param functionNames - The names of funcitons to authorize.
+   */
+  addAccessKey(publicKey, allowance, receiverId, functionNames) {
+    return this.addAccessKeyWithNonce(publicKey, allowance, receiverId, functionNames, 0n);
+  }
+  /**
+   * Creates a add access key promise action and adds it to the current promise.
+   * Allows you to specify the nonce.
+   *
+   * @param publicKey - The public key to add as a access key.
+   * @param allowance - The allowance for the key in yoctoNEAR.
+   * @param receiverId - The account ID of the receiver.
+   * @param functionNames - The names of funcitons to authorize.
+   * @param nonce - The nonce to use.
+   */
+  addAccessKeyWithNonce(publicKey, allowance, receiverId, functionNames, nonce) {
+    return this.addAction(new AddAccessKey(publicKey, allowance, receiverId, functionNames, nonce));
+  }
+  /**
+   * Creates a delete key promise action and adds it to the current promise.
+   *
+   * @param publicKey - The public key to delete from the account.
+   */
+  deleteKey(publicKey) {
+    return this.addAction(new DeleteKey(publicKey));
+  }
+  /**
+   * Creates a delete account promise action and adds it to the current promise.
+   *
+   * @param beneficiaryId - The beneficiary of the account deletion - the account to recieve all of the remaining funds of the deleted account.
+   */
+  deleteAccount(beneficiaryId) {
+    return this.addAction(new DeleteAccount(beneficiaryId));
+  }
+  /**
+   * Joins the provided promise with the current promise, making the current promise a joint promise subtype.
+   *
+   * @param other - The promise to join with the current promise.
+   */
+  and(other) {
+    const subtype = new PromiseJoint(this, other, null);
+    return new NearPromise(subtype, false);
+  }
+  /**
+   * Adds a callback to the current promise.
+   *
+   * @param other - The promise to be executed as the promise.
+   */
+  then(other) {
+    assert$1(other.subtype instanceof PromiseSingle, "Cannot callback joint promise.");
+    assert$1(other.subtype.after === null, "Cannot callback promise which is already scheduled after another");
+    other.subtype.after = this;
+    return other;
+  }
+  /**
+   * Sets the shouldReturn field to true.
+   */
+  asReturn() {
+    this.shouldReturn = true;
+    return this;
+  }
+  /**
+   * Recursively goes through the current promise to get the promise index.
+   */
+  constructRecursively() {
+    const result = this.subtype.constructRecursively();
+    if (this.shouldReturn) {
+      promiseReturn(result);
+    }
+    return result;
+  }
+  /**
+   * Called by NearBindgen, when return object is a NearPromise instance.
+   */
+  onReturn() {
+    this.asReturn().constructRecursively();
+  }
+}
+
 function assert(statement, message) {
   if (!statement) {
     throw Error(`Assertion failed: ${message}`);
@@ -844,16 +1498,39 @@ function assert(statement, message) {
 
 const words = ["there", "their", "about", "would", "these", "other", "words", "could", "write", "first", "water", "after", "where", "right", "think", "three", "years", "place", "sound", "great", "again", "still", "every", "small", "found", "those", "never", "under", "might", "while", "house", "world", "below", "asked", "going", "large", "until", "along", "shall", "being", "often", "earth", "began", "since", "study", "night", "light", "above", "paper", "parts", "young", "story", "point", "times", "heard", "whole", "white", "given", "means", "music", "miles", "thing", "today", "later", "using", "money", "lines", "order", "group", "among", "learn", "known", "space", "table", "early", "trees", "short", "hands", "state", "black", "shown", "stood", "front", "voice", "kinds", "makes", "comes", "close", "power", "lived", "vowel", "taken", "built", "heart", "ready", "quite", "class", "bring", "round", "horse", "shows", "piece", "green", "stand", "birds", "start", "river", "tried", "least", "field", "whose", "girls", "leave", "added", "color", "third", "hours", "moved", "plant", "doing", "names", "forms", "heavy", "ideas", "cried", "check", "floor", "begin", "woman", "alone", "plane", "spell", "watch", "carry", "wrote", "clear", "named", "books", "child", "glass", "human", "takes", "party", "build", "seems", "blood", "sides", "seven", "mouth", "solve", "north", "value", "death", "maybe", "happy", "tells", "gives", "looks", "shape", "lives", "steps", "areas", "sense", "speak", "force", "ocean", "speed", "women", "metal", "south", "grass", "scale", "cells", "lower", "sleep", "wrong", "pages", "ships", "needs", "rocks", "eight", "major", "level", "total", "ahead", "reach", "stars", "store", "sight", "terms", "catch", "works", "board", "cover", "songs", "equal", "stone", "waves", "guess", "dance", "spoke", "break", "cause", "radio", "weeks", "lands", "basic", "liked", "trade", "fresh", "final", "fight", "meant", "drive", "spent", "local", "waxes", "knows", "train", "bread", "homes", "teeth", "coast", "thick", "brown", "clean", "quiet", "sugar", "facts", "steel", "forth", "rules", "notes", "units", "peace", "month", "verbs", "seeds", "helps", "sharp", "visit", "woods", "chief", "walls", "cross", "wings", "grown", "cases", "foods", "crops", "fruit", "stick", "wants", "stage", "sheep", "nouns", "plain", "drink", "bones", "apart", "turns"];
 
-var _dec, _dec2, _dec3, _dec4, _dec5, _dec6, _dec7, _class, _class2;
-let WordanaMain = (_dec = NearBindgen({}), _dec2 = call({}), _dec3 = call({}), _dec4 = call({
+var _dec, _dec2, _dec3, _dec4, _dec5, _dec6, _dec7, _dec8, _dec9, _dec10, _dec11, _class, _class2;
+let WordanaMain = (_dec = NearBindgen({
+  requireInit: true
+}), _dec2 = initialize(), _dec3 = call({
+  payableFunction: true
+}), _dec4 = call({
+  payableFunction: true
+}), _dec5 = call({}), _dec6 = call({
   privateFunction: true
-}), _dec5 = call({}), _dec6 = call({}), _dec7 = view(), _dec(_class = (_class2 = class WordanaMain {
+}), _dec7 = view(), _dec8 = view(), _dec9 = call({}), _dec10 = call({
+  payableFunction: true
+}), _dec11 = call({
+  payableFunction: true
+}), _dec(_class = (_class2 = class WordanaMain {
   gameInstances = new UnorderedMap('games');
+  wordOfTheDay = '';
+  tokensToBeEarned = 1000000000000000000000000n;
+  owner = '';
+  yoctoNEAR = 1000000000000000000000000n;
+  init({
+    _tokensToEarn
+  }) {
+    this.owner = predecessorAccountId();
+    this.tokensToBeEarned = _tokensToEarn;
+    const randomNumbers = randomSeed();
+    this.wordOfTheDay = words[randomNumbers[0]];
+  }
   // This method changes the state, for which it cost gas
   create_game_instance({
     player2Id,
     entryPrice
   }) {
+    assert(entryPrice === attachedDeposit(), "Please deposit the exact amount specified as entry price");
     const player1Id = predecessorAccountId();
     assert(player1Id !== player2Id, 'You cannot invite yourself to a game');
 
@@ -871,9 +1548,9 @@ let WordanaMain = (_dec = NearBindgen({}), _dec2 = call({}), _dec3 = call({}), _
       prizeCollected: false,
       status: 'pending',
       wordToGuess,
-      player2HasEntered: false
+      player2HasEntered: false,
+      rewardCollected: false
     };
-    this.stake_coins();
     this.gameInstances.set(player1Id, newGameInstance);
     // stake function
     log(`new game instance created ${player2Id}`);
@@ -881,9 +1558,9 @@ let WordanaMain = (_dec = NearBindgen({}), _dec2 = call({}), _dec3 = call({}), _
   }
   enter_game(player1Id) {
     const gameToEnter = this.gameInstances.get(player1Id);
+    assert(gameToEnter.entryPrice === attachedDeposit(), "Please deposit the exact amount specified as entry price");
     if (gameToEnter.status !== 'concluded') {
       if (gameToEnter.player2Id === predecessorAccountId()) {
-        this.stake_coins();
         gameToEnter.status = 'in progress';
         gameToEnter.player2HasEntered = true;
         this.gameInstances.set(player1Id, gameToEnter);
@@ -895,9 +1572,6 @@ let WordanaMain = (_dec = NearBindgen({}), _dec2 = call({}), _dec3 = call({}), _
     }
     log(`Player 2 has entered the game`);
     return gameToEnter;
-  }
-  stake_coins() {
-    log("coins staked");
   }
   record_game({
     player1Id,
@@ -951,10 +1625,94 @@ let WordanaMain = (_dec = NearBindgen({}), _dec2 = call({}), _dec3 = call({}), _
     log('reading the game instances');
     return this.gameInstances.get(player1Id);
   }
+  get_word_for_single_player({
+    appkey
+  }) {
+    const randomNumbers = randomSeed();
+    return words[randomNumbers[0]];
+  }
+  set_appkey({
+    newAppkey
+  }) {
+    assert(predecessorAccountId() === this.owner, "You are not allowed to call this function");
+    // this.appKey = newAppkey
+  }
 
   // winner claim reward function
+  multiplayer_claim_reward({
+    player1Id
+  }) {
+    const game = this.gameInstances.get(player1Id);
+    assert(game.status === 'concluded', "The game has not concluded");
+    assert(game.winner === predecessorAccountId(), "You are not the winner of this game");
+
+    // Send the money to the winner
+    const toTransfar = game.entryPrice + game.entryPrice;
+    NearPromise.new(predecessorAccountId()).transfer(toTransfar);
+    game.rewardCollected = true;
+    this.gameInstances.set(player1Id, game);
+  }
+  singleplayer_claim_reward() {
+    const toTransfar = this.tokensToBeEarned;
+    NearPromise.new(predecessorAccountId()).transfer(toTransfar);
+  }
   // refund for draw function
-}, (_applyDecoratedDescriptor(_class2.prototype, "create_game_instance", [_dec2], Object.getOwnPropertyDescriptor(_class2.prototype, "create_game_instance"), _class2.prototype), _applyDecoratedDescriptor(_class2.prototype, "enter_game", [_dec3], Object.getOwnPropertyDescriptor(_class2.prototype, "enter_game"), _class2.prototype), _applyDecoratedDescriptor(_class2.prototype, "stake_coins", [_dec4], Object.getOwnPropertyDescriptor(_class2.prototype, "stake_coins"), _class2.prototype), _applyDecoratedDescriptor(_class2.prototype, "record_game", [_dec5], Object.getOwnPropertyDescriptor(_class2.prototype, "record_game"), _class2.prototype), _applyDecoratedDescriptor(_class2.prototype, "conclude_game", [_dec6], Object.getOwnPropertyDescriptor(_class2.prototype, "conclude_game"), _class2.prototype), _applyDecoratedDescriptor(_class2.prototype, "get_game_instance", [_dec7], Object.getOwnPropertyDescriptor(_class2.prototype, "get_game_instance"), _class2.prototype)), _class2)) || _class);
+}, (_applyDecoratedDescriptor(_class2.prototype, "init", [_dec2], Object.getOwnPropertyDescriptor(_class2.prototype, "init"), _class2.prototype), _applyDecoratedDescriptor(_class2.prototype, "create_game_instance", [_dec3], Object.getOwnPropertyDescriptor(_class2.prototype, "create_game_instance"), _class2.prototype), _applyDecoratedDescriptor(_class2.prototype, "enter_game", [_dec4], Object.getOwnPropertyDescriptor(_class2.prototype, "enter_game"), _class2.prototype), _applyDecoratedDescriptor(_class2.prototype, "record_game", [_dec5], Object.getOwnPropertyDescriptor(_class2.prototype, "record_game"), _class2.prototype), _applyDecoratedDescriptor(_class2.prototype, "conclude_game", [_dec6], Object.getOwnPropertyDescriptor(_class2.prototype, "conclude_game"), _class2.prototype), _applyDecoratedDescriptor(_class2.prototype, "get_game_instance", [_dec7], Object.getOwnPropertyDescriptor(_class2.prototype, "get_game_instance"), _class2.prototype), _applyDecoratedDescriptor(_class2.prototype, "get_word_for_single_player", [_dec8], Object.getOwnPropertyDescriptor(_class2.prototype, "get_word_for_single_player"), _class2.prototype), _applyDecoratedDescriptor(_class2.prototype, "set_appkey", [_dec9], Object.getOwnPropertyDescriptor(_class2.prototype, "set_appkey"), _class2.prototype), _applyDecoratedDescriptor(_class2.prototype, "multiplayer_claim_reward", [_dec10], Object.getOwnPropertyDescriptor(_class2.prototype, "multiplayer_claim_reward"), _class2.prototype), _applyDecoratedDescriptor(_class2.prototype, "singleplayer_claim_reward", [_dec11], Object.getOwnPropertyDescriptor(_class2.prototype, "singleplayer_claim_reward"), _class2.prototype)), _class2)) || _class);
+function singleplayer_claim_reward() {
+  const _state = WordanaMain._getState();
+  if (!_state && WordanaMain._requireInit()) {
+    throw new Error("Contract must be initialized");
+  }
+  const _contract = WordanaMain._create();
+  if (_state) {
+    WordanaMain._reconstruct(_contract, _state);
+  }
+  const _args = WordanaMain._getArgs();
+  const _result = _contract.singleplayer_claim_reward(_args);
+  WordanaMain._saveToStorage(_contract);
+  if (_result !== undefined) if (_result && _result.constructor && _result.constructor.name === "NearPromise") _result.onReturn();else env.value_return(WordanaMain._serialize(_result, true));
+}
+function multiplayer_claim_reward() {
+  const _state = WordanaMain._getState();
+  if (!_state && WordanaMain._requireInit()) {
+    throw new Error("Contract must be initialized");
+  }
+  const _contract = WordanaMain._create();
+  if (_state) {
+    WordanaMain._reconstruct(_contract, _state);
+  }
+  const _args = WordanaMain._getArgs();
+  const _result = _contract.multiplayer_claim_reward(_args);
+  WordanaMain._saveToStorage(_contract);
+  if (_result !== undefined) if (_result && _result.constructor && _result.constructor.name === "NearPromise") _result.onReturn();else env.value_return(WordanaMain._serialize(_result, true));
+}
+function set_appkey() {
+  const _state = WordanaMain._getState();
+  if (!_state && WordanaMain._requireInit()) {
+    throw new Error("Contract must be initialized");
+  }
+  const _contract = WordanaMain._create();
+  if (_state) {
+    WordanaMain._reconstruct(_contract, _state);
+  }
+  const _args = WordanaMain._getArgs();
+  const _result = _contract.set_appkey(_args);
+  WordanaMain._saveToStorage(_contract);
+  if (_result !== undefined) if (_result && _result.constructor && _result.constructor.name === "NearPromise") _result.onReturn();else env.value_return(WordanaMain._serialize(_result, true));
+}
+function get_word_for_single_player() {
+  const _state = WordanaMain._getState();
+  if (!_state && WordanaMain._requireInit()) {
+    throw new Error("Contract must be initialized");
+  }
+  const _contract = WordanaMain._create();
+  if (_state) {
+    WordanaMain._reconstruct(_contract, _state);
+  }
+  const _args = WordanaMain._getArgs();
+  const _result = _contract.get_word_for_single_player(_args);
+  if (_result !== undefined) if (_result && _result.constructor && _result.constructor.name === "NearPromise") _result.onReturn();else env.value_return(WordanaMain._serialize(_result, true));
+}
 function get_game_instance() {
   const _state = WordanaMain._getState();
   if (!_state && WordanaMain._requireInit()) {
@@ -996,20 +1754,6 @@ function record_game() {
   WordanaMain._saveToStorage(_contract);
   if (_result !== undefined) if (_result && _result.constructor && _result.constructor.name === "NearPromise") _result.onReturn();else env.value_return(WordanaMain._serialize(_result, true));
 }
-function stake_coins() {
-  const _state = WordanaMain._getState();
-  if (!_state && WordanaMain._requireInit()) {
-    throw new Error("Contract must be initialized");
-  }
-  const _contract = WordanaMain._create();
-  if (_state) {
-    WordanaMain._reconstruct(_contract, _state);
-  }
-  const _args = WordanaMain._getArgs();
-  const _result = _contract.stake_coins(_args);
-  WordanaMain._saveToStorage(_contract);
-  if (_result !== undefined) if (_result && _result.constructor && _result.constructor.name === "NearPromise") _result.onReturn();else env.value_return(WordanaMain._serialize(_result, true));
-}
 function enter_game() {
   const _state = WordanaMain._getState();
   if (!_state && WordanaMain._requireInit()) {
@@ -1038,6 +1782,17 @@ function create_game_instance() {
   WordanaMain._saveToStorage(_contract);
   if (_result !== undefined) if (_result && _result.constructor && _result.constructor.name === "NearPromise") _result.onReturn();else env.value_return(WordanaMain._serialize(_result, true));
 }
+function init() {
+  const _state = WordanaMain._getState();
+  if (_state) {
+    throw new Error("Contract already initialized");
+  }
+  const _contract = WordanaMain._create();
+  const _args = WordanaMain._getArgs();
+  const _result = _contract.init(_args);
+  WordanaMain._saveToStorage(_contract);
+  if (_result !== undefined) if (_result && _result.constructor && _result.constructor.name === "NearPromise") _result.onReturn();else env.value_return(WordanaMain._serialize(_result, true));
+}
 
-export { conclude_game, create_game_instance, enter_game, get_game_instance, record_game, stake_coins };
+export { conclude_game, create_game_instance, enter_game, get_game_instance, get_word_for_single_player, init, multiplayer_claim_reward, record_game, set_appkey, singleplayer_claim_reward };
 //# sourceMappingURL=wordana.js.map

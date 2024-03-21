@@ -1,5 +1,5 @@
 // Find all our documentation at https://docs.near.org
-import { NearBindgen, near, call, view, UnorderedMap, AccountId, initialize } from 'near-sdk-js';
+import { NearBindgen, near, call, view, UnorderedMap, AccountId, initialize, NearPromise } from 'near-sdk-js';
 import { GameInstance } from './types';
 import { assert } from './utils';
 import words from './words';
@@ -8,13 +8,13 @@ import words from './words';
 class WordanaMain {
 
     gameInstances: UnorderedMap<GameInstance> = new UnorderedMap<GameInstance>('games');
-    wordOfTheDay: string;
-    tokensToBeEarned: number;
-    appKey: string;
-    owner: AccountId;
+    wordOfTheDay: string = '';
+    tokensToBeEarned: bigint = 1000000000000000000000000n;
+    owner: AccountId = '';
+    yoctoNEAR = 1000000000000000000000000n
 
     @initialize({ privateFunction: true })
-    init({ _tokensToEarn }: { _tokensToEarn: number }) {
+    init({ _tokensToEarn }: { _tokensToEarn: bigint }) {
         this.owner = near.predecessorAccountId()
         this.tokensToBeEarned = _tokensToEarn;
         const randomNumbers: Uint8Array = near.randomSeed();
@@ -125,7 +125,6 @@ class WordanaMain {
 
     @view ({})
     get_word_for_single_player({appkey}:{appkey: string}): string{
-        assert(appkey === this.appKey, "Wrong app key")
         const randomNumbers: Uint8Array = near.randomSeed();
         return words[randomNumbers[0]]
     }
@@ -133,7 +132,7 @@ class WordanaMain {
     @call({})
     set_appkey({newAppkey}:{newAppkey:string}): void{
         assert(near.predecessorAccountId() === this.owner, "You are not allowed to call this function")
-        this.appKey = newAppkey
+        // this.appKey = newAppkey
     }
 
     // winner claim reward function
@@ -145,11 +144,16 @@ class WordanaMain {
 
         // Send the money to the winner
         const toTransfar = game.entryPrice + game.entryPrice;
-        const promise = near.promiseBatchCreate(near.predecessorAccountId());
-        near.promiseBatchActionTransfer(promise, toTransfar);
+        NearPromise.new(near.predecessorAccountId()).transfer(toTransfar);
 
         game.rewardCollected = true;
         this.gameInstances.set(player1Id, game);
+    }
+
+    @call({payableFunction: true})
+    singleplayer_claim_reward(): void{
+        const toTransfar = this.tokensToBeEarned;
+        NearPromise.new(near.predecessorAccountId()).transfer(toTransfar);
     }
     // refund for draw function
 }

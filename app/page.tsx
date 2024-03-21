@@ -7,19 +7,24 @@ import Link from "next/link";
 import { useAccount } from "wagmi";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { Wallet } from "./services/near-wallet";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { wallet } from "./services/setup";
 
-const CONTRACT_NAME = "guestbook.near-examples.testnet";
 
-// When creating the wallet you can choose to create an access key, so the user
-// can skip signing non-payable methods when talking wth the  contract
-const wallet = new Wallet({ createAccessKeyFor: CONTRACT_NAME });
+export default function Home () {
 
-export default function Home() {
+  const [isSignedIn, setIsSinged] = useState(false)
+
   useEffect(() => {
-    wallet.startUp();
+    checkStatus().then((isSignedIn)=>{
+      setIsSinged(isSignedIn)
+    })
   }, [wallet]);
+
+  const checkStatus =async (): Promise<boolean>=>{
+    const isSignedIn = await wallet.startUp()
+    return isSignedIn
+  }
 
   // window.onload = async () => {
   //   const isSignedIn = await wallet.startUp();

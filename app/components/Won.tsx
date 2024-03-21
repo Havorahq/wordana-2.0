@@ -7,6 +7,7 @@ import { CONTRACT_ADDRESS } from "../smart-contract/constants";
 import CONTRACT_ABI2 from "../smart-contract/wordanamain-abi.json";
 import Button from "../components/Button";
 import { useRouter } from "next/navigation";
+import { wordanaInt } from "../services/setup";
 
 const Won = () => {
   const router = useRouter();
@@ -23,10 +24,9 @@ const Won = () => {
   });
 
   const collectReward = async () => {
-    singlePlayerCollectReward({
-      args: ["password"],
-    });
-    router.push("/reward");
+    await wordanaInt.singlePlayerClaimReward().then(()=>{
+      router.push("/reward");
+    })
   };
   return (
     <div className="flex flex-col items-center gap-3 m-28 mb-16">
